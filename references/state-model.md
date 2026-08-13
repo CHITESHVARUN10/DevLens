@@ -77,6 +77,9 @@ Abandoning a unit mid-way is allowed — DevLens never blocks the human, it only
 
 - `state/current.json` — the session state above
 - `state/last-checkpoint.json` — the diff marker for the previous checkpoint (internal)
-- `checkpoints/*.json` + `*.md` — one artifact per completed learning unit
+- `checkpoints/*.json` + `*.md` — one artifact per completed learning unit; manual (user-triggered) checkpoints carry `"kind": "manual"` and are stored in the same directory with a `manual-<id>` id
+- `bugs/*.json` + `*.md` — one artifact per debugged bug (PRD §9.3)
+- `decisions/*.json` + `*.md` — one artifact per recorded design decision
+- `quiz/<date>.jsonl` — the quiz audit trail (low ceremony, append-only)
 
 **Never** store chat transcripts, raw diffs beyond the checkpoint summary, or arbitrary conversation content. `.devlens/` should stay small and inspectable.

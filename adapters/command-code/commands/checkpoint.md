@@ -1,0 +1,1 @@
+Follow /devlens checkpoint $ARGUMENTS

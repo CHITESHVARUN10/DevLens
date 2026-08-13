@@ -32,6 +32,12 @@ Parse the first argument and load the matching subcommand file (progressive disc
 | `map` | [commands/map.md](commands/map.md) | How related files/modules connect. |
 | `trace` | [commands/trace.md](commands/trace.md) | One thing's journey through the code, hop by hop. |
 | `changes` | [commands/changes.md](commands/changes.md) | Human-readable summary of what changed. |
+| `debug` | [commands/debug.md](commands/debug.md) | Structured debugging walkthrough (six-stage protocol). |
+| `bugs` | [commands/bugs.md](commands/bugs.md) | Bug history from `.devlens/bugs/`. |
+| `postmortem` | [commands/postmortem.md](commands/postmortem.md) | Narrative postmortem of one bug. |
+| `recap` | [commands/recap.md](commands/recap.md) | Session understanding summary from the artifacts. |
+| `checkpoint` | [commands/checkpoint.md](commands/checkpoint.md) | Manual, user-triggered understanding save. |
+| `quiz` | [commands/quiz.md](commands/quiz.md) | Quiz — the only path to CONFIRMED. |
 | *(none)* | — | Status + help, per [references/response-format.md](references/response-format.md) §6. |
 
 Anything else: show usage; never act on an unknown subcommand.
@@ -44,9 +50,9 @@ Anything else: show usage; never act on an unknown subcommand.
 4. Learning Mode **exits automatically** when the active plan completes — it does not persist indefinitely.
 5. `/ask` always uses the current learning context as **primary grounding**, not generic chat.
 6. `/review` teaches the human to inspect code themselves — it is **never** an AI code-quality verdict.
-7. Debugging is first-class learning material — never an invisible background process (Phase 3 ships `/debug`; until then, surface bugs and their reasoning explicitly).
+7. Debugging is first-class learning material — never an invisible background process. Use `/debug` (six-stage protocol), record bugs as artifacts, and postmortem them. (PRD §7.5)
 8. Caveman Mode compresses communication; it **never** removes technical meaning, caveats, or risk information.
-9. DevLens **does not fabricate understanding**: EXPLAINED / ENGAGED / CONFIRMED are distinct states and are never conflated; `/learn continue` is a choice to proceed, **never** evidence of understanding.
+9. DevLens **does not fabricate understanding**: EXPLAINED / ENGAGED / CONFIRMED are distinct states and are never conflated; `/learn continue` is a choice to proceed, **never** evidence of understanding. `/quiz` is the mechanism that reaches CONFIRMED.
 10. `.devlens/` stores meaningful structured artifacts only — not a transcript.
 11. DevLens state is session-scoped; it is not a long-term personal memory system.
 
@@ -74,7 +80,7 @@ State lives in `.devlens/state/current.json` in the **user's project** (git root
 
 - **EXPLAINED** — an explanation was produced. Weakest state; says nothing about the human.
 - **ENGAGED** — the user actively interacted (`/ask`, `/review`, `/tour`). Positive signal, not proof.
-- **CONFIRMED** — understanding was tested/demonstrated (Phase 4 ships `/quiz`; until then only an explicit user confirmation qualifies).
+- **CONFIRMED** — understanding was tested/demonstrated via `/quiz` (the only path), or an explicit user confirmation.
 
 `/learn continue` is **never** any of these. Never claim the user understands anything without a CONFIRMED-level signal.
 
@@ -85,6 +91,8 @@ State lives in `.devlens/state/current.json` in the **user's project** (git root
 - [references/caveman.md](references/caveman.md) — compression protocol + response depths
 - [references/teaching-mode.md](references/teaching-mode.md) — how `/ask` escalates into teaching
 - [references/decision-log.md](references/decision-log.md) — when and how design decisions get recorded
+- [references/bug-protocol.md](references/bug-protocol.md) — the six-stage debugging protocol
+- [references/quiz-protocol.md](references/quiz-protocol.md) — question design, grading, the CONFIRMED rules
 - [references/response-format.md](references/response-format.md) — exact output templates
 
 ## Scripts (deterministic layer)
@@ -107,6 +115,13 @@ node "${COMMANDCODE_SKILL_DIR}/scripts/decision.js" get <id|topic>  # one decisi
 node "${COMMANDCODE_SKILL_DIR}/scripts/changes.js" since-last --json  # diff since checkpoint marker (or HEAD)
 node "${COMMANDCODE_SKILL_DIR}/scripts/changes.js" since <ref> --json  # diff against a ref
 node "${COMMANDCODE_SKILL_DIR}/scripts/changes.js" history <n> --json  # last n checkpoints + their files
+node "${COMMANDCODE_SKILL_DIR}/scripts/bug.js" add --title "..." --symptom "..." --root-cause "..." --fix "..." --verification "..." [--lesson "..."]
+node "${COMMANDCODE_SKILL_DIR}/scripts/bug.js" list / get <id|topic> / latest
+node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint-extra.js" save --name "..." --notes "..." [--area "..."]   # manual checkpoint
+node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint-extra.js" list-manual
+node "${COMMANDCODE_SKILL_DIR}/scripts/quiz.js" record --unit <unit-id> --result confirmed|partial|failed --detail "..."
+node "${COMMANDCODE_SKILL_DIR}/scripts/quiz.js" summary [--unit <unit-id>]
+node "${COMMANDCODE_SKILL_DIR}/scripts/quiz.js" set-confirmed <unit-id>   # the one place the confirmed transition lives
 ```
 
 If a script fails, stop and report — never continue with broken or guessed state.
@@ -116,3 +131,5 @@ If a script fails, stop and report — never continue with broken or guessed sta
 - [templates/state.schema.json](templates/state.schema.json) — machine-readable state schema (validated on every read/write)
 - [templates/checkpoint.md](templates/checkpoint.md) — checkpoint artifact template
 - [templates/decision.md](templates/decision.md) — decision artifact template
+- [templates/bug.md](templates/bug.md) — bug artifact template
+- [templates/quiz.md](templates/quiz.md) — quiz session template

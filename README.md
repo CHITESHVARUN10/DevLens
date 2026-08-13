@@ -5,7 +5,7 @@
 
 DevLens is a skill for AI coding agents that inserts human understanding checkpoints into agentic software development. It lets the AI do the heavy implementation while ensuring you periodically stop, understand what was built, why it was built, how it works, and how to review it yourself.
 
-This repo is the DevLens skill source. Phases 1–2 (core loop + understanding & navigation) are implemented; Phase 3 (debugging & reinforcement) per the PRD roadmap comes next.
+This repo is the DevLens skill source. All three phases are implemented — the complete PRD §7 command set (18 commands) is shipped.
 
 ## Commands
 
@@ -25,8 +25,14 @@ This repo is the DevLens skill source. Phases 1–2 (core loop + understanding &
 | `/devlens map [target]` | How related files/modules connect. |
 | `/devlens trace <thing>` | One thing's journey through the code, hop by hop. |
 | `/devlens changes [n]` | Human-readable summary of what changed. |
+| `/devlens debug [symptom]` | Structured debugging walkthrough (six stages). |
+| `/devlens bugs [id]` | Bug history (list, or detail one). |
+| `/devlens postmortem [id]` | Narrative postmortem of one bug. |
+| `/devlens recap [area]` | Session understanding summary from the artifacts. |
+| `/devlens checkpoint <name>` | Manual, user-triggered understanding save. |
+| `/devlens quiz [area]` | Quiz — the only path to CONFIRMED understanding. |
 
-The full PRD (including the Phase 3–4 command set) lives in [PRD.md](PRD.md).
+The full PRD lives in [PRD.md](PRD.md).
 
 ## How it works
 
@@ -40,9 +46,9 @@ The full PRD (including the Phase 3–4 command set) lives in [PRD.md](PRD.md).
 ```
 SKILL.md              ← constitution: mission, principles, hard rules, dispatch
 commands/             ← per-subcommand behavior (loaded on dispatch)
-references/           ← protocols: state model, learning units, caveman, teaching, decision log, formats
-scripts/              ← deterministic layer (Node.js, zero deps): state, checkpoint, decision, change tooling
-templates/            ← state schema, checkpoint + decision artifact templates
+references/           ← protocols: state model, learning units, caveman, teaching, decision log, bug + quiz protocols, formats
+scripts/              ← deterministic layer (Node.js, zero deps): state, checkpoint, decision, change, bug, quiz tooling
+templates/            ← state schema, checkpoint, decision, bug + quiz artifact templates
 adapters/             ← per-host installation/invocation (command-code done; others stubbed)
 ```
 
@@ -55,7 +61,8 @@ cmd skills list --debug          # devlens should appear, no warnings
 mkdir -p ~/.commandcode/commands
 cp adapters/command-code/commands/*.md ~/.commandcode/commands/
 # gives /learn, /ask, /tour, /dl-review, /explain, /concept, /decision, /why,
-# /compare, /map, /dl-trace, /changes (see note below)
+# /compare, /map, /dl-trace, /changes, /debug, /bugs, /postmortem, /recap,
+# /checkpoint, /quiz (see note below)
 ```
 
 `/review` and `/trace` collide with Command Code built-ins, so those wrappers are `/dl-review` and `/dl-trace`; `/skill:devlens review|trace` and `/devlens review|trace` always work.
@@ -70,6 +77,8 @@ See [adapters/command-code/README.md](adapters/command-code/README.md) for detai
 /devlens learn                # build something in learning units
 /devlens learn continue       # proceed to the next unit
 /devlens ask "why did you use X?"   # interrogate the current unit
+/devlens debug                # structured debugging when something breaks
+/devlens quiz                 # confirm your understanding
 ```
 
 ## Development
@@ -82,4 +91,6 @@ See [adapters/command-code/README.md](adapters/command-code/README.md) for detai
 
 - **Phase 1 (shipped):** core loop — `/learn`, `/learn continue`, `/learn review`, `/ask`, `/review`, `/tour`; Caveman protocol; learning-unit protocol; session state; Command Code adapter.
 - **Phase 2 (shipped):** understanding & navigation — `/explain`, `/concept`, `/decision`, `/why`, `/compare`, `/map`, `/trace`, `/changes`; decision log + change extraction; decision artifacts.
-- **Phase 3 (PRD §7.5/§7.6):** debugging & reinforcement — `/debug`, `/bugs`, `/postmortem`, `/recap`, `/checkpoint`, `/quiz` — next plan.
+- **Phase 3 (shipped):** debugging & reinforcement — `/debug`, `/bugs`, `/postmortem`, `/recap`, `/checkpoint`, `/quiz`; bug protocol + quiz protocol; bug artifacts, manual checkpoints, quiz audit trail.
+
+**All 18 PRD §7 commands shipped across the three phases.** Deferred PRD §12 open questions: algorithmic learning-unit boundary detection, cross-harness plan detection, non-Command-Code adapters.

@@ -50,6 +50,12 @@ This gives you:
 | `/map` | `/devlens map $ARGUMENTS` |
 | `/dl-trace` | `/devlens trace $ARGUMENTS` |
 | `/changes` | `/devlens changes $ARGUMENTS` |
+| `/debug` | `/devlens debug $ARGUMENTS` |
+| `/bugs` | `/devlens bugs $ARGUMENTS` |
+| `/postmortem` | `/devlens postmortem $ARGUMENTS` |
+| `/recap` | `/devlens recap $ARGUMENTS` |
+| `/checkpoint` | `/devlens checkpoint $ARGUMENTS` |
+| `/quiz` | `/devlens quiz $ARGUMENTS` |
 
 ## 3. Collision handling
 
@@ -57,6 +63,8 @@ Command Code ships built-ins that win dispatch over custom commands with the sam
 
 - **`/review`** (built-in PR review) → wrapper is **`/dl-review`**
 - **`/trace`** (built-in "copy the current trace id") → wrapper is **`/dl-trace`**
+
+The Phase 3 names (`/debug`, `/bugs`, `/postmortem`, `/recap`, `/checkpoint`, `/quiz`) have no built-in collisions — they ship under their direct names.
 
 Both remain fully reachable inside the skill itself — `/devlens review`, `/devlens trace`, and `/skill:devlens review|trace` all work regardless of shadowing.
 
@@ -71,6 +79,12 @@ Both remain fully reachable inside the skill itself — `/devlens review`, `/dev
 /devlens why "subcommand routing"
 /devlens map commands
 /devlens changes       # summary of what changed since the last checkpoint
+/devlens debug         # structured debugging walkthrough
+/devlens bugs          # bug history
+/devlens postmortem    # narrative postmortem of the most recent bug
+/devlens recap         # session understanding summary
+/devlens checkpoint "subcommand dispatch"   # manual understanding save
+/devlens quiz          # the path to CONFIRMED understanding
 ```
 
 ## Notes
