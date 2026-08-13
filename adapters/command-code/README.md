@@ -1,6 +1,6 @@
 # Command Code Adapter
 
-Install DevLens for Command Code. The skill itself is standard Agent Skills; this adapter adds Command-Code-native wrapper commands so `/learn`, `/ask`, `/tour`, and `/dl-review` feel like first-class commands instead of `/devlens <subcommand>`.
+Install DevLens for Command Code. The skill itself is standard Agent Skills; this adapter adds Command-Code-native wrapper commands so `/learn`, `/ask`, `/tour`, and the Phase 2 commands feel like first-class commands instead of `/devlens <subcommand>`.
 
 ## 1. Install the skill
 
@@ -42,15 +42,23 @@ This gives you:
 | `/ask` | `/devlens ask $ARGUMENTS` |
 | `/tour` | `/devlens tour $ARGUMENTS` |
 | `/dl-review` | `/devlens review $ARGUMENTS` |
+| `/explain` | `/devlens explain $ARGUMENTS` |
+| `/concept` | `/devlens concept $ARGUMENTS` |
+| `/decision` | `/devlens decision $ARGUMENTS` |
+| `/why` | `/devlens why $ARGUMENTS` |
+| `/compare` | `/devlens compare $ARGUMENTS` |
+| `/map` | `/devlens map $ARGUMENTS` |
+| `/dl-trace` | `/devlens trace $ARGUMENTS` |
+| `/changes` | `/devlens changes $ARGUMENTS` |
 
-## 3. The `/review` collision
+## 3. Collision handling
 
-Command Code ships a built-in `/review` (PR review). Built-ins always win dispatch, so the skill's `review` subcommand is reachable as:
+Command Code ships built-ins that win dispatch over custom commands with the same name. The affected DevLens subcommands:
 
-- `/dl-review` (the wrapper above), or
-- `/skill:devlens review` — the namespaced form always resolves to the skill, shadowed or not.
+- **`/review`** (built-in PR review) → wrapper is **`/dl-review`**
+- **`/trace`** (built-in "copy the current trace id") → wrapper is **`/dl-trace`**
 
-The core skill itself is unaffected — `/devlens review` and `/skill:devlens review` both work.
+Both remain fully reachable inside the skill itself — `/devlens review`, `/devlens trace`, and `/skill:devlens review|trace` all work regardless of shadowing.
 
 ## 4. Try it
 
@@ -58,6 +66,11 @@ The core skill itself is unaffected — `/devlens review` and `/skill:devlens re
 /devlens tour          # project map + state initialized
 /devlens learn         # enter Learning Mode, implement unit 1, stop
 /devlens learn review  # recap the latest checkpoint
+/devlens explain architecture
+/devlens concept       # the concepts this project uses
+/devlens why "subcommand routing"
+/devlens map commands
+/devlens changes       # summary of what changed since the last checkpoint
 ```
 
 ## Notes

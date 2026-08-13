@@ -24,6 +24,14 @@ Parse the first argument and load the matching subcommand file (progressive disc
 | `ask` | [commands/ask.md](commands/ask.md) | Context-grounded Q&A about the current unit/codebase. |
 | `review` | [commands/review.md](commands/review.md) | Guided walkthrough of how the developer inspects the code. |
 | `tour` | [commands/tour.md](commands/tour.md) | High-level project/area map. |
+| `explain` | [commands/explain.md](commands/explain.md) | Structured explanation of overall/architecture/area/file/flow. |
+| `concept` | [commands/concept.md](commands/concept.md) | The project's programming concepts, in project terms. |
+| `decision` | [commands/decision.md](commands/decision.md) | Surface recorded design decisions and why. |
+| `why` | [commands/why.md](commands/why.md) | Reasoning behind one specific decision, with evidence. |
+| `compare` | [commands/compare.md](commands/compare.md) | Chosen approach vs. a named alternative. |
+| `map` | [commands/map.md](commands/map.md) | How related files/modules connect. |
+| `trace` | [commands/trace.md](commands/trace.md) | One thing's journey through the code, hop by hop. |
+| `changes` | [commands/changes.md](commands/changes.md) | Human-readable summary of what changed. |
 | *(none)* | — | Status + help, per [references/response-format.md](references/response-format.md) §6. |
 
 Anything else: show usage; never act on an unknown subcommand.
@@ -76,6 +84,7 @@ State lives in `.devlens/state/current.json` in the **user's project** (git root
 - [references/learning-unit.md](references/learning-unit.md) — what counts as a learning unit
 - [references/caveman.md](references/caveman.md) — compression protocol + response depths
 - [references/teaching-mode.md](references/teaching-mode.md) — how `/ask` escalates into teaching
+- [references/decision-log.md](references/decision-log.md) — when and how design decisions get recorded
 - [references/response-format.md](references/response-format.md) — exact output templates
 
 ## Scripts (deterministic layer)
@@ -92,6 +101,12 @@ node "${COMMANDCODE_SKILL_DIR}/scripts/state.js" complete-plan
 node "${COMMANDCODE_SKILL_DIR}/scripts/state.js" set-understanding <unit-id> engaged
 node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint.js" write --unit <id> --name "..." --summary "..." --concepts "a,b" --flow "..." --diff
 node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint.js" latest
+node "${COMMANDCODE_SKILL_DIR}/scripts/decision.js" add --title "..." --what "..." --why "..." [--alternatives "a,b"] [--consequences "..."]
+node "${COMMANDCODE_SKILL_DIR}/scripts/decision.js" list            # recorded decisions
+node "${COMMANDCODE_SKILL_DIR}/scripts/decision.js" get <id|topic>  # one decision
+node "${COMMANDCODE_SKILL_DIR}/scripts/changes.js" since-last --json  # diff since checkpoint marker (or HEAD)
+node "${COMMANDCODE_SKILL_DIR}/scripts/changes.js" since <ref> --json  # diff against a ref
+node "${COMMANDCODE_SKILL_DIR}/scripts/changes.js" history <n> --json  # last n checkpoints + their files
 ```
 
 If a script fails, stop and report — never continue with broken or guessed state.
@@ -100,3 +115,4 @@ If a script fails, stop and report — never continue with broken or guessed sta
 
 - [templates/state.schema.json](templates/state.schema.json) — machine-readable state schema (validated on every read/write)
 - [templates/checkpoint.md](templates/checkpoint.md) — checkpoint artifact template
+- [templates/decision.md](templates/decision.md) — decision artifact template

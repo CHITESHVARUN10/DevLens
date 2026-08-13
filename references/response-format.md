@@ -108,6 +108,14 @@ Commands:
 /devlens ask <question>     — context-grounded question about current unit/code
 /devlens review [area]      — guided walkthrough of how to inspect the code
 /devlens tour [area]        — project or area map
+/devlens explain [target]   — structured explanation of overall/architecture/area/file/flow
+/devlens concept [name]     — the programming concepts this project uses, in project terms
+/devlens decision [id]      — recorded design decisions (list, or detail one)
+/devlens why <decision>     — reasoning behind one specific decision, with evidence
+/devlens compare X vs Y     — chosen approach vs. a named alternative
+/devlens map [target]       — how related files/modules connect
+/devlens trace <thing>      — one thing's journey through the code, hop by hop
+/devlens changes [n]        — human-readable summary of what changed
 ```
 
 ## 7. Empty states
@@ -115,3 +123,136 @@ Commands:
 - No checkpoints yet (`/devlens learn review`): `No checkpoints yet — start with /devlens learn.`
 - Not in Learning Mode but `/devlens learn continue` was run: `Not in Learning Mode — run /devlens learn first.`
 - No active plan: `No active plan — describe what to build, then run /devlens learn.`
+
+## 8. Explain (structured depth tiers)
+
+Depth: Normal by default; `--deep` adds alternatives, tradeoffs, edge cases, architectural reasoning.
+
+```
+EXPLAIN: <target>
+
+WHAT IT IS:   <one or two lines, project terms>
+HOW IT WORKS: <the mechanism, concrete>
+WHY IT'S SHAPED THIS WAY: <the reason, from code/decisions>
+WHAT TO READ NEXT: <paths>
+```
+
+Deep adds `ALTERNATIVES / TRADEOFFS / EDGE CASES:` sections after WHY.
+
+## 9. Concept (project-specific)
+
+```
+CONCEPT: <name>
+
+IN THIS PROJECT: <one line, anchored to this codebase>
+LIKE YOU ALREADY KNOW: <map onto a familiar concept>
+WHERE IT LIVES: <file/line pointers>
+HOW THIS PROJECT USES IT DIFFERENTLY: <contrast, when relevant>
+```
+
+Bare `/devlens concept`:
+
+```
+CONCEPTS IN THIS PROJECT
+
+CORE:        <concept> — <where it lives>; <concept> — <where>
+INCIDENTAL:  <concept> — <where>
+ADVANCED:    <concept> — <where>
+```
+
+## 10. Decision (list / detail)
+
+```
+DECISIONS   (from .devlens/decisions/)
+
+[dec-xxxx] <title> — why: <one line>
+[dec-yyyy] <title> — why: <one line>
+```
+
+Detail (`/devlens decision <id>`):
+
+```
+DECISION: <title>  [dec-xxxx]
+
+WHAT:   <chosen>
+WHY:    <reason>
+ALT:    <alternatives considered>
+CONSEQ: <consequences>
+UNIT:   <linked unit, when any>
+```
+
+Empty state: `No decisions recorded yet.` Then offer candidates derived from the code (non-default choices worth explaining) and offer to capture them.
+
+## 11. Why (one decision, with evidence)
+
+```
+WHY: <decision>
+
+ANSWER: <the reasoning, grounded>
+EVIDENCE: <file:line or file references that embody the choice>
+GROUNDED ON: <recorded decision | reconstructed from code — never present
+              reconstruction as a recorded fact>
+```
+
+If reconstructed: end with `Want me to record this? (/devlens decision <id> — then decision.js add)`.
+
+## 12. Compare (chosen vs. alternative)
+
+```
+COMPARE: <chosen> vs <alternative>
+
+CHOSEN:      <what was chosen, with evidence file:line>
+ALTERNATIVE: <how the alternative differs>
+TRADEOFF:    <what was actually given up / gained>
+ALTERNATIVE WINS WHEN: <conditions where the alternative would win>
+IF YOU SWITCHED: <what would break or move>
+```
+
+## 13. Map (text diagram)
+
+```
+MAP: <feature/module>
+
+entry: <file> — <one line>
+  │ <what flows across>
+  ▼
+<module> — <one line>
+  │ <what flows across>
+  ▼
+exit: <file> — <one line>
+
+DATA STRUCTURES: <the key ones and where they live>
+BOUNDARIES: <where modules meet, and the contract at each boundary>
+```
+
+Bare `/devlens map`: map the current unit from its checkpoint; if none, prompt for a target.
+
+## 14. Trace (numbered hops)
+
+```
+TRACE: <thing>
+
+1. <file>:<fn> — <what it does> — passes <x> to
+2. <file>:<fn> — <what it does> — passes <y> to
+3. <file>:<fn> — <what it does>
+
+BOUNDARY CROSSINGS: <hop 2> crosses from <module A> to <module B>
+OUTCOME: <the terminal state/return>
+```
+
+Skip nothing that changes state or routes control.
+
+## 15. Changes (human summary, never raw diff)
+
+```
+CHANGES (since <base>)
+
+NEW:      <file/feature> — <why it matters>
+MOVED:    <file> -> <file> — <why>
+DELETED:  <file> — <why>
+MODIFIED: <file> — <what changed and why it matters>
+
+RISK SPOTS: <anything in the diff that deserves a careful look>
+```
+
+`/devlens changes <n>`: same shape, but across the last n checkpoints — one block per unit.
