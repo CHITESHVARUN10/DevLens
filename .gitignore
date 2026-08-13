@@ -1,2 +1,16 @@
+# DevLens runtime state (session-scoped, lives in the user's project)
 .devlens/
+
+# IDE / agent tooling — never part of the project
 .commandcode/
+.vscode/
+.idea/
+.claude/
+.codex/
+.copilot/
+.continue/
+.antigravity/
+.gemini/
+.cursor/
+.opencode/
+.roo/
