@@ -1,0 +1,1 @@
+Follow /devlens ask $ARGUMENTS

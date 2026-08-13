@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devlens.dev/schema/state/current.json",
+  "title": "DevLens session state",
+  "description": "Schema for .devlens/state/current.json — DevLens session state (mode, active plan, current unit, awaiting-human flag).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "mode", "plan", "currentUnit", "awaitingHuman", "understanding", "updatedAt"],
+  "properties": {
+    "version": { "const": 1 },
+    "mode": { "enum": ["normal", "learning"] },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "summary", "units"],
+      "properties": {
+        "source": { "enum": ["plan-mode", "agent", "none"] },
+        "summary": { "type": "string" },
+        "units": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "currentUnit": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "index", "name", "status"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^unit-[A-Za-z0-9]+$" },
+            "index": { "type": "integer", "minimum": 0 },
+            "name": { "type": "string" },
+            "status": { "enum": ["in-progress", "done"] }
+          }
+        }
+      ]
+    },
+    "awaitingHuman": { "type": "boolean" },
+    "understanding": {
+      "type": "object",
+      "additionalProperties": {
+        "enum": ["explained", "engaged", "confirmed"]
+      }
+    },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

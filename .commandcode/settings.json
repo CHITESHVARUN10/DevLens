@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(git -C /Users/chiteshvarun/D-drive/DevLens status --short && git -C /Users/chiteshvarun/D-drive/DevLens log --oneline -3 2>/dev/null; echo \"---\"; which node cmd; node --version)",
+      "Shell(rm -rf /tmp/devlens-smoke && mkdir -p /tmp/devlens-smoke && cd /tmp/devlens-smoke && git init -q && echo \"let x = 1;\" > index.js && git add -A && git commit -qm \"init\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js init --plan-summary \"Build auth\" --plan-source agent --units \"Auth foundation|Payment flow\" && echo \"---GET---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js get && echo \"---SET-MODE---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode learning && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name \"Auth foundation\" --index 0 && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-unit && echo \"---STATE JSON---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js get --json)",
+      "Shell(cd /tmp/devlens-smoke && echo \"console.log('hi');\" >> index.js && mkdir -p src && echo \"export {};\" > src/auth.js && node /Users/chiteshvarun/D-drive/DevLens/scripts/checkpoint.js write --unit unit-msrp9vr82ay --name \"Auth foundation\" --summary \"Auth context + JWT handling\" --concepts \"JWT,Context API\" --flow \"Login -> AuthContext -> API -> JWT\" --diff && echo \"---LATEST---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/checkpoint.js latest && echo \"---LATEST JSON---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/checkpoint.js latest --json && echo \"---MD---\" && cat .devlens/checkpoints/*.md)",
+      "Shell(cd /tmp/devlens-smoke && rm -rf .devlens && git checkout -q . && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js init --plan-summary \"Build auth\" --plan-source agent --units \"Auth foundation|Payment flow\" >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode learning >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name \"Auth foundation\" --index 0 >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-unit >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-understanding unit-x explained && echo \"---ILLEGAL: complete-plan while unit in progress---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name \"Payment flow\" --index 1 >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-plan; echo \"exit=$?\"; echo \"---ILLEGAL: set-mode normal while unit in-progress---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode normal; echo \"exit=$?\"; echo \"---ILLEGAL: complete-unit with none---\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-awaiting false >/dev/null; node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-unit; echo \"exit=$?\")",
+      "Shell(rm:*)",
+      "Shell(git:*)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js init --plan-summary Build auth --plan-source agent --units Auth foundation|Payment flow > /dev/null)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode learning > /dev/null)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name Auth foundation --index 0 > /dev/null)",
+      "Shell(echo:*)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-plan)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode normal)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-unit > /dev/null)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js get)",
+      "Shell(cat:*)",
+      "Shell(node -e const u=require('/Users/chiteshvarun/D-drive/DevLens/scripts/util.js'); console.log('projectRoot:', u.projectRoot()); console.log('stateFile:', u.stateFile(u.projectRoot()));)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js init --plan-summary Build auth --plan-source agent --units Auth foundation|Payment flow)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode learning)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name Auth foundation --index 0)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js complete-unit)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name Payment flow --index 1)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js mark-planned)",
+      "Shell(cd /tmp/devlens-smoke && git checkout -q . && rm -rf .devlens && echo \"=== fresh init + unit ===\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js init --plan-summary \"Build auth\" --units \"Auth foundation\" >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-mode learning >/dev/null && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js set-unit --name \"Auth foundation\" --index 0 >/dev/null && echo \"=== make some changes ===\" && echo \"console.log('hi');\" >> index.js && mkdir -p src && echo \"export {};\" > src/auth.js && echo \"=== checkpoint write --diff ===\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/checkpoint.js write --unit unit-msrprn64ag9 --name \"Auth foundation\" --summary \"Auth context + JWT\" --concepts \"JWT,Context\" --flow \"Login -> AuthContext -> API\" --diff && echo \"=== files list should NOT include .devlens/ ===\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/checkpoint.js latest --json | python3 -c \"import json,sys; d=json.load(sys.stdin); print('files:', d['files']); assert '.devlens/' not in d['files'], 'FAIL: .devlens/ leaked'; print('OK: no .devlens/ in files')\" && echo \"=== diff cmd ===\" && node /Users/chiteshvarun/D-drive/DevLens/scripts/checkpoint.js diff && echo \"=== non-repo behavior ===\" && cd /tmp && mkdir -p devlens-nonrepo && cd devlens-nonrepo && node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js init --plan-summary \"t\" >/dev/null 2>&1 && echo \"non-repo init: OK ($(ls .devlens/state/current.json 2>/dev/null))\")",
+      "Shell(mkdir:*)",
+      "Shell(ln:*)",
+      "Shell(cmd:*)",
+      "Shell(cp:*)",
+      "Shell(run_command:*)",
+      "Shell(node /Users/chiteshvarun/D-drive/DevLens/scripts/state.js get 2 > /dev/null)",
+      "Shell(ls:*)",
+      "Shell(for f in /Users/chiteshvarun/D-drive/DevLens/scripts/*.js; do node --check \"$f\" && echo \"OK: $(basename $f)\"; done && cd /Users/chiteshvarun/D-drive/DevLens && git init -q && git add -A && git status --short)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
