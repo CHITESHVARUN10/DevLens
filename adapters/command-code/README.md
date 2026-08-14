@@ -2,9 +2,17 @@
 
 Install DevLens for Command Code. The skill itself is standard Agent Skills; this adapter adds Command-Code-native wrapper commands so `/learn`, `/ask`, `/tour`, and the Phase 2 commands feel like first-class commands instead of `/devlens <subcommand>`.
 
-## 1. Install the skill
+## 1. Install
 
-The repo root IS the skill. Symlink it into the user skills directory under the name `devlens` (the directory name must match the skill `name` in `SKILL.md`):
+The quickest way is the interactive installer:
+
+```bash
+npx devlens-installer
+```
+
+It asks which harness(es) and components you want, then installs the skill into `~/.commandcode/skills/devlens/` and the wrapper commands into `~/.commandcode/commands/` in one go.
+
+**Manual fallback** — the repo root IS the skill. Symlink it into the user skills directory under the name `devlens` (the directory name must match the skill `name` in `SKILL.md`):
 
 ```bash
 ln -s ~/D-drive/DevLens ~/.commandcode/skills/devlens
@@ -25,7 +33,7 @@ cmd skills list --debug
 
 or load per-session with `cmd --skill ~/D-drive/DevLens`.
 
-## 2. Install the wrapper commands
+## 2. Wrapper commands
 
 Copy the wrapper files into the Command Code custom-commands directory:
 

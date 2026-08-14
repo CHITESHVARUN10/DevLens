@@ -50,22 +50,32 @@ references/           ← protocols: state model, learning units, caveman, teach
 scripts/              ← deterministic layer (Node.js, zero deps): state, checkpoint, decision, change, bug, quiz tooling
 templates/            ← state schema, checkpoint, decision, bug + quiz artifact templates
 adapters/             ← per-host installation/invocation (command-code done; others stubbed)
+installer/            ← interactive npx installer (zero-dep Node.js; builds a self-contained package)
 ```
 
-## Install (Command Code)
+## Install
+
+The interactive installer asks which harness(es) you use and which components you want, then installs everything in one go — no shell scripts, no manual copying:
 
 ```bash
-ln -s ~/D-drive/DevLens ~/.commandcode/skills/devlens
-cmd skills list --debug          # devlens should appear, no warnings
-
-mkdir -p ~/.commandcode/commands
-cp adapters/command-code/commands/*.md ~/.commandcode/commands/
-# gives /learn, /ask, /tour, /dl-review, /explain, /concept, /decision, /why,
-# /compare, /map, /dl-trace, /changes, /debug, /bugs, /postmortem, /recap,
-# /checkpoint, /quiz (see note below)
+npx devlens-installer
 ```
 
+- **Core skill** → each selected harness's skills directory (e.g. `~/.commandcode/skills/devlens/`)
+- **Wrapper commands** → each selected harness's commands directory (e.g. `~/.commandcode/commands/`), giving you the short aliases: `/learn`, `/ask`, `/tour`, `/dl-review`, `/explain`, `/concept`, `/decision`, `/why`, `/compare`, `/map`, `/dl-trace`, `/changes`, `/debug`, `/bugs`, `/postmortem`, `/recap`, `/checkpoint`, `/quiz`
+
 `/review` and `/trace` collide with Command Code built-ins, so those wrappers are `/dl-review` and `/dl-trace`; `/skill:devlens review|trace` and `/devlens review|trace` always work.
+
+The installer lives in [installer/](installer/) (zero-dependency Node.js); build the self-contained package with `npm run build`, then `npm publish`.
+
+## The plan → learn loop
+
+This is the intended way to build with DevLens:
+
+1. `/plan <task>` — Command Code plans read-only; the plan is saved to `~/.commandcode/plans/<name>.md`.
+2. In plan review press **`esc`** (Cancel) — the plan stays saved with status `not-implemented`. Do **not** press `ctrl+a` (Approve), which starts raw agent implementation without DevLens.
+3. `/devlens learn` — DevLens reads the saved plan, splits it into learning units, implements unit 1, stops with a checkpoint.
+4. `/devlens learn continue` — review the checkpoint, then proceed to the next unit. Repeat until the plan completes and Learning Mode exits.
 
 See [adapters/command-code/README.md](adapters/command-code/README.md) for details and fallbacks.
 

@@ -1,0 +1,31 @@
+{
+  "name": "devlens-installer",
+  "version": "0.1.0",
+  "description": "Interactive installer for the DevLens skill — pick your harness and components, installs everything in one go.",
+  "license": "MIT",
+  "type": "commonjs",
+  "bin": {
+    "devlens-installer": "cli.js"
+  },
+  "files": [
+    "cli.js",
+    "lib/",
+    "bundle.js",
+    "bundle/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node bundle.js",
+    "test": "node --check cli.js && node --check lib/harnesses.js && node --check lib/install.js && node --check lib/prompts.js"
+  },
+  "keywords": [
+    "devlens",
+    "skill",
+    "agentskills",
+    "installer",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=14"
+  }
+}
