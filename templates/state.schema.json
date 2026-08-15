@@ -8,6 +8,7 @@
   "required": ["version", "mode", "plan", "currentUnit", "awaitingHuman", "understanding", "updatedAt"],
   "properties": {
     "version": { "const": 1 },
+    "root": { "type": "string", "description": "Resolved project root where .devlens lives (diagnostics)" },
     "mode": { "enum": ["normal", "learning"] },
     "plan": {
       "type": "object",
@@ -15,6 +16,7 @@
       "required": ["source", "summary", "units"],
       "properties": {
         "source": { "enum": ["plan-mode", "agent", "none"] },
+        "path": { "type": "string", "description": "Absolute path of the source plan file, when one exists (plan-mode)" },
         "summary": { "type": "string" },
         "units": {
           "type": "array",

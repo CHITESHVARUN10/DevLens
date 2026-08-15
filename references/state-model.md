@@ -4,7 +4,7 @@ The authoritative schema and transition rules for `.devlens/state/current.json`.
 
 ## Where state lives
 
-- **Project root:** the git root of the user's project; when the project is not a git repo, the working directory.
+- **Project root:** the git root when the working directory is inside a repo, else the working directory. Never an unrelated parent — the resolved root is recorded in `state.root` for diagnostics.
 - **File:** `.devlens/state/current.json` inside the project root.
 - **Lifetime:** scoped to the current development session (PRD §6.6). DevLens is not a long-term memory system. If the harness supports session resume, state continues naturally; DevLens never accumulates history across sessions on its own.
 
@@ -13,9 +13,11 @@ The authoritative schema and transition rules for `.devlens/state/current.json`.
 ```json
 {
   "version": 1,
+  "root": "/absolute/path/to/project",
   "mode": "normal" | "learning",
   "plan": {
     "source": "plan-mode" | "agent" | "none",
+    "path": "/absolute/path/to/plan-file.md",   // present when source is plan-mode
     "summary": "human-readable plan summary",
     "units": ["unit name 1", "unit name 2", "..."]
   },
@@ -39,8 +41,10 @@ The authoritative schema and transition rules for `.devlens/state/current.json`.
 
 | Field | Meaning |
 |---|---|
+| `root` | Resolved project root where `.devlens` lives (diagnostics). |
 | `mode` | `normal` (default) or `learning`. `learning` means the agent is executing under the Learning Mode protocol. |
 | `plan.source` | Where the plan came from: the harness plan-mode plan (`plan-mode`), the agent's own recorded plan (`agent`), or none. |
+| `plan.path` | Absolute path of the source plan file (present when `source: plan-mode`); resolved by `scripts/plan.js locate`. |
 | `plan.units` | Ordered list of learning-unit names — conceptual units, never file checklists (see `references/learning-unit.md`). |
 | `currentUnit` | The unit currently in progress (`in-progress`) or just completed (`done`). `null` when no unit is active. |
 | `awaitingHuman` | `true` when the agent has stopped at a checkpoint and must not continue until explicit `/learn continue`. |
@@ -77,7 +81,7 @@ Abandoning a unit mid-way is allowed — DevLens never blocks the human, it only
 
 - `state/current.json` — the session state above
 - `state/last-checkpoint.json` — the diff marker for the previous checkpoint (internal)
-- `checkpoints/*.json` + `*.md` — one artifact per completed learning unit; manual (user-triggered) checkpoints carry `"kind": "manual"` and are stored in the same directory with a `manual-<id>` id
+- `checkpoints/*.json` — **one artifact per completed learning unit** (no `.md`; the exact diff lives in git, the JSON carries the diff-verified file list + diff stat). Manual (user-triggered) checkpoints carry `"kind": "manual"` and are stored in the same directory with a `manual-<id>` id
 - `bugs/*.json` + `*.md` — one artifact per debugged bug (PRD §9.3)
 - `decisions/*.json` + `*.md` — one artifact per recorded design decision
 - `quiz/<date>.jsonl` — the quiz audit trail (low ceremony, append-only)

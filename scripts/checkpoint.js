@@ -7,8 +7,9 @@
  *   node scripts/checkpoint.js latest [--json]
  *   node scripts/checkpoint.js diff          # raw git status/diff since last marker (read-only)
  *
- * Creates .devlens/checkpoints/<ts>-<unit-id>.json (structured) and .md
- * (human-readable, rendered from templates/checkpoint.md).
+ * Creates ONE artifact per unit: .devlens/checkpoints/<ts>-<unit-id>.json
+ * (structured, with diff-verified file list + diff stat). No .md file — the
+ * exact diff lives in git; the JSON is the human-facing summary.
  */
 
 const fs = require("fs");
@@ -18,7 +19,6 @@ const util = require("./util");
 
 const ROOT = util.projectRoot();
 const CHECKPOINTS_DIR = util.checkpointsDir(ROOT);
-const TEMPLATE_FILE = path.join(util.skillRoot(), "templates", "checkpoint.md");
 
 const MARKER_FILE = path.join(util.devlensDir(ROOT), "state", "last-checkpoint.json");
 const DEVLENS_PREFIX = path.join(".devlens", path.sep);
@@ -71,28 +71,6 @@ function diffSinceLastMarker() {
   return { ...diff, marker: null, headSha };
 }
 
-function renderMarkdown(data) {
-  let template;
-  try {
-    template = fs.readFileSync(TEMPLATE_FILE, "utf8");
-  } catch {
-    template = "# Checkpoint: {name}\n\n- **Unit ID:** {unitId}\n- **Date:** {date}\n\n## Summary\n\n{summary}\n\n## Flow\n\n{flow}\n\n## Concepts\n\n{concepts}\n\n## Files (diff-verified)\n\n{files}\n";
-  }
-  const files =
-    data.files && data.files.length
-      ? data.files.map((f) => "- `" + f + "`").join("\n")
-      : "_No file changes detected._";
-  const concepts = data.concepts && data.concepts.length ? data.concepts.map((c) => "- " + c).join("\n") : "_None recorded._";
-  return template
-    .replace(/\{name\}/g, data.name)
-    .replace(/\{unitId\}/g, data.unitId)
-    .replace(/\{date\}/g, data.date)
-    .replace(/\{summary\}/g, data.summary || "")
-    .replace(/\{flow\}/g, data.flow || "")
-    .replace(/\{concepts\}/g, concepts)
-    .replace(/\{files\}/g, files);
-}
-
 function parseArgs(argv) {
   const out = { _: [] };
   for (let i = 0; i < argv.length; i++) {
@@ -134,6 +112,7 @@ function cmdWrite(args) {
     files: diff.status
       .map((line) => line.replace(/^\S+\s+/, "").replace(/^"|"$/g, ""))
       .filter((f) => !f.startsWith(DEVLENS_PREFIX)),
+    diffStat: diff.stat,
     date,
     diff: {
       status: diff.status,
@@ -143,14 +122,12 @@ function cmdWrite(args) {
   };
 
   util.writeJson(base + ".json", data);
-  fs.writeFileSync(base + ".md", renderMarkdown(data));
 
   // record the marker so the next checkpoint can diff against this point
   const marker = { headSha: diff.headSha || null, ts, date, unitId };
   util.writeJson(MARKER_FILE, marker);
 
   console.log(`checkpoint written: ${base}.json`);
-  console.log(`                   ${base}.md`);
   if (diff.status.length) {
     console.log(`files changed: ${diff.status.length}`);
   } else {
@@ -180,6 +157,8 @@ function cmdLatest(args) {
     console.log("");
     console.log(data.summary || "(no summary)");
     if (data.concepts && data.concepts.length) console.log("\nconcepts: " + data.concepts.join(", "));
+    if (data.files && data.files.length) console.log("\nfiles:\n" + data.files.map((f) => "  - " + f).join("\n"));
+    if (data.diffStat && data.diffStat.length) console.log("\ndiff stat:\n" + data.diffStat.join("\n"));
   }
 }
 

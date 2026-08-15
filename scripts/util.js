@@ -8,18 +8,27 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 
-/** Project root: git root when inside a repo, else the working directory. */
+/**
+ * Project root: the git root when the cwd is inside a repo, else the working
+ * directory. Never climbs to an unrelated parent — if the detected git root
+ * does not contain the cwd, the cwd wins.
+ */
 function projectRoot() {
+  const cwd = process.cwd();
   try {
-    const root = execFileSync("git", ["rev-parse", "--show-toplevel"], {
+    const gitRoot = execFileSync("git", ["rev-parse", "--show-toplevel"], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();
-    if (root) return root;
+    if (gitRoot) {
+      const rel = path.relative(gitRoot, cwd);
+      const inside = rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+      if (inside) return gitRoot;
+    }
   } catch {
     /* not a git repo — fall through */
   }
-  return process.cwd();
+  return cwd;
 }
 
 /** The skill's own directory (three levels up from scripts/). */

@@ -22,6 +22,7 @@ node "${COMMANDCODE_SKILL_DIR}/scripts/state.js" set-mode learning
 node "${COMMANDCODE_SKILL_DIR}/scripts/state.js" set-unit --name "<unit name>" --index <n>
 node "${COMMANDCODE_SKILL_DIR}/scripts/state.js" complete-unit
 node "${COMMANDCODE_SKILL_DIR}/scripts/state.js" get
+node "${COMMANDCODE_SKILL_DIR}/scripts/plan.js" locate        # find the active harness plan file
 node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint.js" write --unit <unit-id> --name "<name>" --summary "<caveman summary>" --concepts "c1,c2" --flow "<flow>" --diff
 node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint.js" latest
 ```
@@ -32,14 +33,14 @@ node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint.js" latest
 
 1. `state.js get`. If `mode: learning` → you're already in Learning Mode; behave as `/devlens learn continue` (below) if `awaitingHuman` is false, else remind the user they must `/learn continue`.
 2. If `mode: normal`:
-   - Read the active plan: the harness plan-mode plan when available, else the user's request plus your own plan summary.
-   - If no plan exists at all → show "No active plan — describe what to build, then run /devlens learn" and stop.
-   - Split the plan into learning units (references/learning-unit.md). Record: `state.js init --plan-summary "<summary>" --plan-source <plan-mode|agent> --units "U1|U2|..."`
+   - **Find the active plan deterministically:** run `plan.js locate`. If it prints a path, read that plan file. (The harness saves `/plan` output to its plans directory — `~/.commandcode/plans/` for Command Code. The plan is a file, not a conversation.)
+   - If no path is printed (exit 1, "no plan files found"), the user has no saved plan → show "No active plan — describe what to build, then run /devlens learn" and stop. Do **not** invent a plan from conversation alone unless the user explicitly describes the task in this session — in that case record it as `--plan-source agent`.
+   - Split the plan into learning units (references/learning-unit.md). Record: `state.js init --plan-summary "<summary>" --plan-source plan-mode --units "U1|U2|..."` and record the plan file path: `state.js set-plan --summary "<summary>" --source plan-mode --path "<plan-file>" --units "U1|U2|..."`
    - `state.js set-mode learning`
 3. Implement unit 1 (index 0): `state.js set-unit --name "<unit name>" --index 0`
 4. Implement the unit fully — all files, tests if the project convention has them, run whatever verification the project uses.
 5. `state.js complete-unit` (marks unit done, `awaitingHuman: true`, understanding → `explained`).
-6. Capture the diff and write the checkpoint artifact:
+6. Capture the diff and write the checkpoint artifact (a single `.json` file per unit — no `.md`; the diff lives in git):
    ```bash
    node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint.js" write --unit <unit-id> --name "<unit name>" --summary "<caveman summary>" --concepts "c1,c2" --flow "<entry> -> <step> -> ..." --diff
    ```

@@ -129,7 +129,6 @@ If a script fails, stop and report — never continue with broken or guessed sta
 ## Templates
 
 - [templates/state.schema.json](templates/state.schema.json) — machine-readable state schema (validated on every read/write)
-- [templates/checkpoint.md](templates/checkpoint.md) — checkpoint artifact template
 - [templates/decision.md](templates/decision.md) — decision artifact template
 - [templates/bug.md](templates/bug.md) — bug artifact template
 - [templates/quiz.md](templates/quiz.md) — quiz session template

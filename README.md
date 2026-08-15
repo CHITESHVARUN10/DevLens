@@ -39,7 +39,7 @@ The full PRD lives in [PRD.md](PRD.md).
 - **Learning Mode** is a stateful execution mode: implement one *conceptual* learning unit, stop, explain (files → what they do → resulting flow → key concepts), and only continue on explicit `/learn continue`. The mode exits automatically when the plan completes.
 - **Understanding is never assumed.** DevLens distinguishes EXPLAINED (explanation produced), ENGAGED (you interacted), and CONFIRMED (understanding tested) — and `/learn continue` is never treated as proof of understanding.
 - **Caveman Mode** compresses DevLens's own output (checkpoints, maps) without ever stripping technical meaning, caveats, or risks.
-- **State** lives in `.devlens/` in your project: `state/current.json` (mode, plan, current unit, awaiting-human flag) plus `checkpoints/` (one structured artifact per completed unit).
+- **State** lives in `.devlens/` in your project: `state/current.json` (mode, plan, current unit, awaiting-human flag) plus `checkpoints/` (one `.json` artifact per completed unit — no `.md`; the diff lives in git).
 
 ## Layout
 
@@ -48,7 +48,7 @@ SKILL.md              ← constitution: mission, principles, hard rules, dispatc
 commands/             ← per-subcommand behavior (loaded on dispatch)
 references/           ← protocols: state model, learning units, caveman, teaching, decision log, bug + quiz protocols, formats
 scripts/              ← deterministic layer (Node.js, zero deps): state, checkpoint, decision, change, bug, quiz tooling
-templates/            ← state schema, checkpoint, decision, bug + quiz artifact templates
+templates/            ← state schema, decision, bug + quiz artifact templates
 adapters/             ← per-host installation/invocation (command-code done; others stubbed)
 installer/            ← interactive npx installer (zero-dep Node.js; builds a self-contained package)
 ```
@@ -74,7 +74,7 @@ This is the intended way to build with DevLens:
 
 1. `/plan <task>` — Command Code plans read-only; the plan is saved to `~/.commandcode/plans/<name>.md`.
 2. In plan review press **`esc`** (Cancel) — the plan stays saved with status `not-implemented`. Do **not** press `ctrl+a` (Approve), which starts raw agent implementation without DevLens.
-3. `/devlens learn` — DevLens reads the saved plan, splits it into learning units, implements unit 1, stops with a checkpoint.
+3. `/devlens learn` — DevLens finds the saved plan file (`scripts/plan.js locate`), splits it into learning units, implements unit 1, stops with a single-file checkpoint.
 4. `/devlens learn continue` — review the checkpoint, then proceed to the next unit. Repeat until the plan completes and Learning Mode exits.
 
 See [adapters/command-code/README.md](adapters/command-code/README.md) for details and fallbacks.

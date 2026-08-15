@@ -16,7 +16,7 @@ Saves the developer's current understanding of an important feature/concept/stat
    ```bash
    node "${COMMANDCODE_SKILL_DIR}/scripts/checkpoint-extra.js" save --name "<name>" --notes "<notes>" [--area "<area>"]
    ```
-   Creates `.devlens/checkpoints/<ts>-manual-<id>.json` + `.md` with `"kind": "manual"`.
+   Creates one artifact: `.devlens/checkpoints/<ts>-manual-<id>.json` with `"kind": "manual"`.
 2. **If no `--notes` given:** ask the developer what they want to save, or synthesize notes from the current conversation context (what was just explained) and say so.
 3. **Output per references/response-format.md §20** — MANUAL CHECKPOINT: name, notes, area, date.
 4. **Record engagement** when a current unit exists (`state.js set-understanding <unit-id> engaged`).

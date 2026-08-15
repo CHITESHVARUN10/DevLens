@@ -34,9 +34,10 @@ When splitting a plan into units, ask:
 
 When `/learn` starts, the agent:
 
-1. Reads the active plan (harness plan-mode plan when available, else its own plan summary).
-2. Proposes a unit sequence using the rules above, recording it in state via `scripts/state.js set-plan`.
-3. Implements **one unit at a time**, stopping at each checkpoint.
+1. Locates the active plan deterministically: `scripts/plan.js locate` (searches the harness plan directories — `~/.commandcode/plans/`, `~/.claude/plans/`, etc. — for the most recent plan file). If no plan file exists and the user has not described a task in this session, stop: "No active plan — describe what to build, then run /devlens learn".
+2. Reads the plan file (or the user's request, recorded as `source: agent`).
+3. Proposes a unit sequence using the rules above, recording it in state via `scripts/state.js set-plan` (with `--path <plan-file> --source plan-mode` when a harness plan file was found).
+4. Implements **one unit at a time**, stopping at each checkpoint.
 
 ## When a plan has no clear units
 

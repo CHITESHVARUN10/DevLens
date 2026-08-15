@@ -6,10 +6,10 @@
  *   node scripts/checkpoint-extra.js save --name "<n>" --notes "<notes>" [--area "<area>"]
  *   node scripts/checkpoint-extra.js list-manual [--json]
  *
- * Creates .devlens/checkpoints/<ts>-manual-<id>.json + .md with "kind": "manual".
- * Distinct from the automatic /learn checkpoint: does NOT touch the diff marker
- * (that belongs to the learning loop only), and carries user notes instead of a
- * diff-verified file list.
+ * Creates ONE artifact: .devlens/checkpoints/<ts>-manual-<id>.json with
+ * "kind": "manual". Distinct from the automatic /learn checkpoint: does NOT
+ * touch the diff marker (that belongs to the learning loop only), and carries
+ * user notes instead of a diff-verified file list.
  */
 
 const fs = require("fs");
@@ -18,30 +18,9 @@ const util = require("./util");
 
 const ROOT = util.projectRoot();
 const CHECKPOINTS_DIR = util.checkpointsDir(ROOT);
-const TEMPLATE_FILE = path.join(util.skillRoot(), "templates", "checkpoint.md");
 
 function newManualId() {
   return "manual-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-}
-
-function renderMarkdown(data) {
-  let template;
-  try {
-    template = fs.readFileSync(TEMPLATE_FILE, "utf8");
-  } catch {
-    template = "# Checkpoint: {name}\n\n- **Kind:** {kind}\n- **Date:** {date}\n\n## Summary\n\n{summary}\n\n## Flow\n\n{flow}\n\n## Concepts\n\n{concepts}\n\n## Files (diff-verified)\n\n{files}\n";
-  }
-  const files = data.files && data.files.length ? data.files.map((f) => "- `" + f + "`").join("\n") : "_User-triggered; no diff scan._";
-  const concepts = data.concepts && data.concepts.length ? data.concepts.map((c) => "- " + c).join("\n") : "_None recorded._";
-  return template
-    .replace(/\{name\}/g, data.name)
-    .replace(/\{unitId\}/g, data.id)
-    .replace(/\{kind\}/g, "manual")
-    .replace(/\{date\}/g, data.date)
-    .replace(/\{summary\}/g, data.notes || "")
-    .replace(/\{flow\}/g, data.flow || "")
-    .replace(/\{concepts\}/g, concepts)
-    .replace(/\{files\}/g, files);
 }
 
 function parseArgs(argv) {
@@ -86,9 +65,7 @@ function cmdSave(args) {
   };
 
   util.writeJson(base + ".json", data);
-  fs.writeFileSync(base + ".md", renderMarkdown(data));
   console.log(`manual checkpoint saved: ${base}.json`);
-  console.log(`                        ${base}.md`);
 }
 
 function cmdListManual(args) {

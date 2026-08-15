@@ -6,7 +6,7 @@
  *   node scripts/state.js init [--force] [--plan-summary "<text>" --plan-source agent|plan-mode] [--units "<u1>|<u2>|..."]
  *   node scripts/state.js get [--json]
  *   node scripts/state.js set-mode normal|learning
- *   node scripts/state.js set-plan --summary "<text>" --source agent|plan-mode|none [--units "<u1>|<u2>|..."]
+ *   node scripts/state.js set-plan --summary "<text>" --source agent|plan-mode|none [--units "<u1>|<u2>|..."] [--path "<plan-file>"]
  *   node scripts/state.js set-unit --name "<name>" [--index N] [--id "<id>"]
  *   node scripts/state.js complete-unit
  *   node scripts/state.js set-awaiting true|false
@@ -87,6 +87,7 @@ function validateState(s) {
 function defaultState() {
   return {
     version: 1,
+    root: ROOT,
     mode: "normal",
     plan: { source: "none", summary: "", units: [] },
     currentUnit: null,
@@ -160,8 +161,10 @@ function cmdGet(args) {
   const s = loadOrInit();
   if (args.json) console.log(JSON.stringify(s, null, 2));
   else {
+    console.log(`root: ${s.root || ROOT}`);
     console.log(`mode: ${s.mode}`);
     console.log(`plan: ${s.plan.source === "none" ? "(none)" : s.plan.summary}`);
+    if (s.plan.path) console.log(`plan file: ${s.plan.path}`);
     console.log(`units: ${s.plan.units.length ? s.plan.units.map((u, i) => `[${i}] ${u}`).join("\n       ") : "(none)"}`);
     if (s.currentUnit) {
       console.log(`currentUnit: [${s.currentUnit.index}] ${s.currentUnit.name} (${s.currentUnit.status})`);
@@ -207,9 +210,11 @@ function cmdSetPlan(args) {
           .filter(Boolean)
       : s.plan.units,
   };
+  if (typeof args.path === "string" && args.path) s.plan.path = args.path;
+  else delete s.plan.path;
   s.currentUnit = null;
   write(s);
-  console.log("plan updated");
+  console.log("plan updated" + (s.plan.path ? ` (from ${s.plan.path})` : ""));
 }
 
 function cmdSetUnit(args) {
